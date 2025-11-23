@@ -20,8 +20,11 @@
 name: Create Zip on all-the-bufo Changes
 
 # Trigger this workflow when changes are pushed to the all-the-bufo folder
+# Only runs on the main branch to avoid unnecessary runs on feature branches
 on:
   push:
+    branches:
+      - main
     paths:
       - 'all-the-bufo/**'
 
@@ -40,7 +43,15 @@ jobs:
       - name: Create zip archive
         run: |
           echo "Creating zip archive of all-the-bufo folder..."
+          if [ ! -d "all-the-bufo" ]; then
+            echo "Error: all-the-bufo folder not found!"
+            exit 1
+          fi
           zip -r all-the-bufo.zip all-the-bufo/
+          if [ $? -ne 0 ]; then
+            echo "Error: Failed to create zip archive"
+            exit 1
+          fi
           echo "Zip archive created successfully"
           ls -lh all-the-bufo.zip
 
