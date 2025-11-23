@@ -33,6 +33,11 @@ jobs:
     name: Create and Upload Zip Archive
     runs-on: ubuntu-latest
 
+    # Limit permissions for security best practices
+    # Only grant necessary permissions for this workflow
+    permissions:
+      contents: read  # Required to checkout repository code
+
     steps:
       # Step 1: Check out the repository code
       - name: Checkout repository
