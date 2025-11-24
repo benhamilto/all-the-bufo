@@ -36,7 +36,7 @@ jobs:
     # Limit permissions for security best practices
     # Only grant necessary permissions for this workflow
     permissions:
-      contents: read  # Required to checkout repository code
+      contents: write  # Required to checkout repository code and create releases
 
     steps:
       # Step 1: Check out the repository code
@@ -69,3 +69,19 @@ jobs:
           path: all-the-bufo.zip
           retention-days: 90
           if-no-files-found: error
+
+      # Step 4: Create or update GitHub release
+      # Creates a release with tag 'latest' or updates it if it exists
+      - name: Create or update GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Release
+          body: |
+            Automatically generated release containing the latest all-the-bufo.zip archive.
+            This release is automatically updated whenever changes are pushed to the all-the-bufo folder.
+          files: all-the-bufo.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
