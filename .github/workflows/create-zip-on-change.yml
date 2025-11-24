@@ -2,7 +2,7 @@
 #
 # Purpose:
 #   This workflow automatically creates a zip archive of the 'all-the-bufo' folder
-#   whenever changes are detected in that directory.
+#   whenever changes are detected in that directory, and publishes it as a GitHub release.
 #
 # Trigger:
 #   - Runs on push events that modify files in the 'all-the-bufo/**' path
@@ -11,11 +11,14 @@
 # Output:
 #   - Creates an artifact named 'all-the-bufo.zip' containing all files from the folder
 #   - Artifact is available for download from the Actions tab for 90 days
+#   - Creates/updates a GitHub release tagged as 'latest' with the zip file as an asset
+#   - Release is published (not a draft) and always contains the most recent version
 #
 # Maintenance Notes:
 #   - To change the artifact retention period, modify the 'retention-days' parameter
 #   - To include additional folders, add more paths to the 'paths' filter
 #   - The zip file preserves the directory structure starting from 'all-the-bufo/'
+#   - The 'latest' tag is used to always overwrite the same release (no version history)
 
 name: Create Zip on all-the-bufo Changes
 
@@ -72,6 +75,8 @@ jobs:
 
       # Step 4: Create or update GitHub release
       # Creates a release with tag 'latest' or updates it if it exists
+      # The 'latest' tag is intentionally used to always provide the most recent version
+      # without maintaining version history or semantic versioning
       - name: Create or update GitHub release
         uses: softprops/action-gh-release@v2
         with:
