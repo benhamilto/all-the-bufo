@@ -1,0 +1,71 @@
+# GitHub Action: Create Zip on all-the-bufo Folder Changes
+#
+# Purpose:
+#   This workflow automatically creates a zip archive of the 'all-the-bufo' folder
+#   whenever changes are detected in that directory.
+#
+# Trigger:
+#   - Runs on push events that modify files in the 'all-the-bufo/**' path
+#   - Only triggers on the default branch (main/master)
+#
+# Output:
+#   - Creates an artifact named 'all-the-bufo.zip' containing all files from the folder
+#   - Artifact is available for download from the Actions tab for 90 days
+#
+# Maintenance Notes:
+#   - To change the artifact retention period, modify the 'retention-days' parameter
+#   - To include additional folders, add more paths to the 'paths' filter
+#   - The zip file preserves the directory structure starting from 'all-the-bufo/'
+
+name: Create Zip on all-the-bufo Changes
+
+# Trigger this workflow when changes are pushed to the all-the-bufo folder
+# Only runs on the main branch to avoid unnecessary runs on feature branches
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'all-the-bufo/**'
+
+jobs:
+  create-zip:
+    name: Create and Upload Zip Archive
+    runs-on: ubuntu-latest
+
+    # Limit permissions for security best practices
+    # Only grant necessary permissions for this workflow
+    permissions:
+      contents: read  # Required to checkout repository code
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Create zip archive of the all-the-bufo folder
+      # Using zip command to preserve directory structure and compression
+      - name: Create zip archive
+        run: |
+          echo "Creating zip archive of all-the-bufo folder..."
+          if [ ! -d "all-the-bufo" ]; then
+            echo "Error: all-the-bufo folder not found!"
+            exit 1
+          fi
+          zip -r all-the-bufo.zip all-the-bufo/
+          if [ $? -ne 0 ]; then
+            echo "Error: Failed to create zip archive"
+            exit 1
+          fi
+          echo "Zip archive created successfully"
+          ls -lh all-the-bufo.zip
+
+      # Step 3: Upload the zip file as a workflow artifact
+      # The artifact will be available for download from the Actions tab
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-the-bufo.zip
+          path: all-the-bufo.zip
+          retention-days: 90
+          if-no-files-found: error
